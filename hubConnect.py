@@ -112,6 +112,9 @@ class client(Thread):
 
 serversocket.listen(5)
 print ('server started and listening')
-while 1:
-	clientsocket, address = serversocket.accept()
-	client(clientsocket, address)
+try:
+	while 1:
+		clientsocket, address = serversocket.accept()
+		client(clientsocket, address)
+except KeyboardInterrupt:
+	exit()
