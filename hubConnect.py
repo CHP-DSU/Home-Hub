@@ -3,12 +3,20 @@ from threading import *
 import Adafruit_BluefruitLE
 from Adafruit_BluefruitLE.services import UART
 
+def getIPAddress():
+	ipAddress = ""
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.connect(("8.8.8.8", 80))
+	ipAddress = s.getsockname()[0]
+	s.close
+	return ipAddress
+
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = "172.16.68.107" 
+hostIP = getIPAddress()
 port = 8000
-print (host)
+print (hostIP)
 print (port)
-serversocket.bind((host, port))
+serversocket.bind((hostIP, port))
 sendCommand = ""
 confirmation = "Cannot connect to device"
 
@@ -75,7 +83,10 @@ class client(Thread):
 		ble.initialize()
 
 		# Start the mainloop process
-		ble.run_mainloop_with(mainBluetooth)
+		try:
+			ble.run_mainloop_with(mainBluetooth)
+		except:
+			return
 
 	def run(self):
 		global sendCommand
@@ -91,15 +102,11 @@ class client(Thread):
 					elif data[0].lower() == "query":
 						sendCommand = "RQT"
 					self.sock.send(b'Connection Success')
-					try:
-						self.bluetoothConnect()
-					except:
-						print("BROKE")
+					self.bluetoothConnect()
 					self.sock.send(confirmation.encode())
 				else:
 					self.sock.send(b'No info sent')
-		except:# (Exception) as e:
-			#print(e)
+		except:
 			self.sock.close()
 			print("Connection Closed on Address\t> " + str(self.addr))
 
