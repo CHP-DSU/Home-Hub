@@ -1,0 +1,2 @@
+Water Heater: 90%
+Washer: 25%
